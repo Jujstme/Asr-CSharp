@@ -27,6 +27,12 @@
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="wasi-sysroot\**" />
+    <EmbeddedResource Remove="wasi-sysroot\**" />
+    <None Remove="wasi-sysroot\**" />
+  </ItemGroup>
+
 <ItemGroup>
   <PackageReference Include="Microsoft.DotNet.ILCompiler.LLVM" Version="9.0.0-*" />
   <PackageReference Include="runtime.win-x64.Microsoft.DotNet.ILCompiler.LLVM" Version="9.0.0-*" />
