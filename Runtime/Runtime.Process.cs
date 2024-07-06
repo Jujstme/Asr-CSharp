@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -11,7 +12,7 @@ public static partial class Runtime
     {
         ulong _pid;
 
-        public enum DerefType
+        public enum PointerSize
         {
             Bit16,
             Bit32,
@@ -115,19 +116,56 @@ public static partial class Runtime
             static unsafe extern void ProcessDetach(ulong pid);
         }
 
-        public T Read<T>(IntPtr address) where T : unmanaged
+        public T? Read<T>(IntPtr address) where T : unmanaged
         {
-            return Read(address, out T value) ? value : default;
+            return Read(address, out T value) ? value : null;
         }
 
-        public IntPtr ReadPointer(IntPtr address, DerefType pointerSize)
+        public IntPtr? ReadPointer(IntPtr address, PointerSize pointerSize)
         {
-            return pointerSize switch
+            return ReadPointer(address, pointerSize, out IntPtr value) ? value : null;
+        }
+
+        public bool ReadPointer(IntPtr address, PointerSize pointerSize, out IntPtr value)
+        {
+            value = IntPtr.Zero;
+            
+            if (address == IntPtr.Zero)
+                return false;
+
+            bool success;
+
+            if (pointerSize == PointerSize.Bit64)
             {
-                DerefType.Bit64 => Read(address, out long value) ? (IntPtr)value : IntPtr.Zero,
-                DerefType.Bit16 => Read(address, out short value) ? (IntPtr)value : IntPtr.Zero,
-                _ or DerefType.Bit32 => Read(address, out int value) ? (IntPtr)value : IntPtr.Zero,
-            };
+                success = Read(address, out long tempVal);
+                value = (IntPtr)tempVal;
+            }
+            else if (pointerSize == PointerSize.Bit16)
+            {
+                success = Read(address, out short tempVal);
+                value = (IntPtr)tempVal;
+
+            }
+            else // PointerSize.Bit32 assumed
+            {
+                success = Read(address, out int tempVal);
+                value = (IntPtr)tempVal;
+            }
+
+            return success;
+        }
+
+        public T? ReadPointerPath<T>(IntPtr baseAddress, PointerSize pointerSize, params int[] offsets) where T : unmanaged
+        {
+            IntPtr addr = baseAddress;
+
+            for (int i = 0; i < offsets.Length - 1; i++)
+            {
+                if (!ReadPointer(addr + offsets[i], pointerSize, out addr))
+                    return null;
+            }
+
+            return Read<T>(addr + offsets.Last());
         }
 
         [System.Runtime.CompilerServices.SkipLocalsInit]
