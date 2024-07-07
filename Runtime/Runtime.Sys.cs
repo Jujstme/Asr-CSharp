@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Asr;
+namespace Runtime;
 
 public static partial class Runtime
 {
@@ -94,107 +94,107 @@ public static partial class Runtime
         [DllImport("env", EntryPoint = "runtime_set_tick_rate")]
         static extern void NewTickRate(double value);
     }
+}
 
-    public static class Timer
+public static class Timer
+{
+    public static void Start()
     {
-        public static void Start()
+        TimerStart();
+        return;
+
+        [WasmImportLinkage]
+        [DllImport("env", EntryPoint = "timer_start")]
+        static extern void TimerStart();
+    }
+
+    public static void Split()
+    {
+        TimerSplit();
+        return;
+
+        [WasmImportLinkage]
+        [DllImport("env", EntryPoint = "timer_split")]
+        static extern void TimerSplit();
+    }
+
+    public static void SkipSplit()
+    {
+        SkipSplit();
+        return;
+
+        [WasmImportLinkage]
+        [DllImport("env", EntryPoint = "timer_skip_split")]
+        static extern void SkipSplit();
+    }
+
+    public static void UndoSplit()
+    {
+        UndoSplit();
+        return;
+
+        [WasmImportLinkage]
+        [DllImport("env", EntryPoint = "timer_undo_split")]
+        static extern void UndoSplit();
+    }
+
+    public static void Reset()
+    {
+        Reset();
+        return;
+
+        [WasmImportLinkage]
+        [DllImport("env", EntryPoint = "timer_reset")]
+        static extern void Reset();
+    }
+
+    public static class SetGameTime
+    {
+        public static void FromTimeSpan(TimeSpan timeSpan)
         {
-            TimerStart();
+            long secs = timeSpan.Seconds;
+            int nanos = timeSpan.Nanoseconds;
+            TimerSetGameTime(secs, nanos);
             return;
 
             [WasmImportLinkage]
-            [DllImport("env", EntryPoint = "timer_start")]
-            static extern void TimerStart();
+            [DllImport("env", EntryPoint = "timer_set_game_time")]
+            static extern void TimerSetGameTime(long secs, int nanos);
         }
 
-        public static void Split()
+        public static void FromSeconds(double seconds)
         {
-            TimerSplit();
-            return;
-
-            [WasmImportLinkage]
-            [DllImport("env", EntryPoint = "timer_split")]
-            static extern void TimerSplit();
+            FromTimeSpan(TimeSpan.FromSeconds(seconds));
         }
 
-        public static void SkipSplit()
+        public static void FromMilliseconds(double milliseconds)
         {
-            SkipSplit();
-            return;
-
-            [WasmImportLinkage]
-            [DllImport("env", EntryPoint = "timer_skip_split")]
-            static extern void SkipSplit();
+            FromTimeSpan(TimeSpan.FromMilliseconds(milliseconds));
         }
 
-        public static void UndoSplit()
+        public static void FromTicks(long ticks)
         {
-            UndoSplit();
-            return;
-
-            [WasmImportLinkage]
-            [DllImport("env", EntryPoint = "timer_undo_split")]
-            static extern void UndoSplit();
+            FromTimeSpan(TimeSpan.FromTicks(ticks));
         }
+    }
 
-        public static void Reset()
-        {
-            Reset();
-            return;
+    public static void PauseGameTime()
+    {
+        TimerPauseGameTime();
+        return;
 
-            [WasmImportLinkage]
-            [DllImport("env", EntryPoint = "timer_reset")]
-            static extern void Reset();
-        }
+        [WasmImportLinkage]
+        [DllImport("env", EntryPoint = "timer_pause_game_time")]
+        static extern void TimerPauseGameTime();
+    }
 
-        public static class SetGameTime
-        {
-            public static void FromTimeSpan(TimeSpan timeSpan)
-            {
-                long secs = timeSpan.Seconds;
-                int nanos = timeSpan.Nanoseconds;
-                TimerSetGameTime(secs, nanos);
-                return;
+    public static void ResumeGameTime()
+    {
+        TimerResumeGameTime();
+        return;
 
-                [WasmImportLinkage]
-                [DllImport("env", EntryPoint = "timer_set_game_time")]
-                static extern void TimerSetGameTime(long secs, int nanos);
-            }
-
-            public static void FromSeconds(double seconds)
-            {
-                FromTimeSpan(TimeSpan.FromSeconds(seconds));
-            }
-
-            public static void FromMilliseconds(double milliseconds)
-            {
-                FromTimeSpan(TimeSpan.FromMilliseconds(milliseconds));
-            }
-
-            public static void FromTicks(long ticks)
-            {
-                FromTimeSpan(TimeSpan.FromTicks(ticks));
-            }
-        }
-
-        public static void PauseGameTime()
-        {
-            TimerPauseGameTime();
-            return;
-
-            [WasmImportLinkage]
-            [DllImport("env", EntryPoint = "timer_pause_game_time")]
-            static extern void TimerPauseGameTime();
-        }
-
-        public static void ResumeGameTime()
-        {
-            TimerResumeGameTime();
-            return;
-
-            [WasmImportLinkage]
-            [DllImport("env", EntryPoint = "timer_resume_game_time")]
-            static extern void TimerResumeGameTime();
-        }
+        [WasmImportLinkage]
+        [DllImport("env", EntryPoint = "timer_resume_game_time")]
+        static extern void TimerResumeGameTime();
     }
 }

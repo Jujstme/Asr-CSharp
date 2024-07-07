@@ -1,24 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Asr;
 
-public class WatcherList : List<Watcher>
+/// <summary>
+/// A Dictionary of watchers
+/// </summary>
+public class WatcherList : Dictionary<string, Watcher>
 {
+    /// <summary>
+    /// Updates every watcher conteined in the dictionary according
+    /// the Update() method defined inside each watcher
+    /// </summary>
     public void UpdateAll()
     {
-        foreach (var watcher in this)
+        foreach (Watcher watcher in this.Values)
             watcher.Update();
     }
 
+    /// <summary>
+    /// Resets the values stored in all the contained watchers,
+    /// including the associated Func&lt;<typeparamref name="T"/>&gt; if defined.
+    /// </summary>
     public void ResetAll()
     {
-        foreach (var watcher in this)
+        foreach (Watcher watcher in this.Values)
             watcher.Reset();
     }
 
-    public Watcher this[string name] => this.First(x => x.Name == name);
+    public void Add(Watcher watcher)
+    {
+        if (watcher.Name == null || watcher.Name == string.Empty)
+            return;
+
+        base[watcher.Name] = watcher;
+    }
 }
 
 public abstract class Watcher

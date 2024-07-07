@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using System;
+using static Runtime.Runtime;
 
 namespace Asr;
 
@@ -7,7 +8,7 @@ public static class Autosplitter
 {
     private static bool firstLoop = true;
     private static bool initCompleted = false;
-    private static Runtime.Process? _process;
+    private static Process? _process;
     private static AutosplitterLogic _autosplitterLogic = new AutosplitterLogic();
 
     [UnmanagedCallersOnly(EntryPoint = "update")]
@@ -24,7 +25,7 @@ public static class Autosplitter
         {
             foreach (string entry in _autosplitterLogic.processNames)
             {
-                _process = Runtime.Process.AttachByName(entry);
+                _process = Process.AttachByName(entry);
 
                 if (_process is not null)
                     break;
@@ -54,8 +55,8 @@ public static class Autosplitter
                 {
                     _autosplitterLogic.Update(_process);
 
-                    Runtime.TimerState timerState = Runtime.GetTimerState();
-                    if (timerState == Runtime.TimerState.RUNNING || timerState == Runtime.TimerState.PAUSED)
+                    TimerState timerState = GetTimerState();
+                    if (timerState == TimerState.RUNNING || timerState == TimerState.PAUSED)
                     {
                         bool? isLoading = _autosplitterLogic.IsLoading(_process);
                         if (isLoading is not null)
@@ -78,8 +79,8 @@ public static class Autosplitter
                             Runtime.Timer.Split();
                     }
 
-                    timerState = Runtime.GetTimerState();
-                    if (timerState == Runtime.TimerState.NOT_RUNNING && _autosplitterLogic.Start(_process))
+                    timerState = GetTimerState();
+                    if (timerState == TimerState.NOT_RUNNING && _autosplitterLogic.Start(_process))
                     {
                         Runtime.Timer.Start();
                         Runtime.Timer.PauseGameTime();
@@ -97,7 +98,7 @@ public static class Autosplitter
                 }
                 catch (Exception e)
                 {
-                    Runtime.PrintMessage(e.Message);
+                    PrintMessage(e.Message);
                 }
             }
             else

@@ -1,4 +1,5 @@
 ﻿using System;
+using static Runtime.Runtime;
 
 namespace Asr;
 
@@ -10,40 +11,40 @@ public class AutosplitterLogic
 
     public void Startup()
     {
-        Runtime.SetTickRate(15);
+        SetTickRate(60);
     }
 
-    public void Init(Runtime.Process process)
+    public void Init(Process process)
     {
 
     }
 
-    public void Update(Runtime.Process process)
+    public void Update(Process process)
     {
 
     }
 
-    public bool Start(Runtime.Process process)
-    {
-        return false;
-    }
-
-    public bool Split(Runtime.Process process)
+    public bool Start(Process process)
     {
         return false;
     }
 
-    public bool Reset(Runtime.Process process)
+    public bool Split(Process process)
     {
         return false;
     }
 
-    public bool? IsLoading(Runtime.Process process)
+    public bool Reset(Process process)
     {
         return false;
     }
 
-    public TimeSpan? GameTime(Runtime.Process process)
+    public bool? IsLoading(Process process)
+    {
+        return false;
+    }
+
+    public TimeSpan? GameTime(Process process)
     {
         return null;
     }
